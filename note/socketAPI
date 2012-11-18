@@ -1,0 +1,43 @@
+socketAPI
+
+常用的API，我先列出来，
+1、创建套接字int socket(int family, int type, int protocol);
+2、connect(int sockfd, (const struct sockaddr*)&connaddr, socklen_t addrlen);
+3、bind(int sockfd, (const struct sockaddr*)&listenaddr, socklen_t addrlen);
+4、listen(int listenfd, int listenQuelen);
+5、accept(int listenfd, (struct sockaddr*)&clientaddr, socklen_t* addrlen);
+
+我今天为什么想起来说这些东西了呢？因为我发现，我对这些东西还是不够熟悉，没有完
+全记到心里。真正弄懂每个参数的含义，这怎么能行呢？
+
+1、int socket(int family, int type, int protocol);
+创建一个网络I/O通信必备的套接字描述符。第一个参数是你创建的套接字的协议族，我们
+常用的是AF_INET代表IPV4。第二个是套接口类型，我现在理解成是传输层的协议：TCP/
+UDP。TCP是SOCK_STREAM，UDP是SOCK_DGRAM。第一二个参数有几个可选值，但并不是每一
+个组合都是合法的。第三个是套接字的协议类型，比如TCP/UDP/SCTP。哦，我对第二个参
+数的理解是错误的，SOCK_STREAM只是套接字的类型，根据这个参数并没有制定传输层的
+协议。最后，提一下这个函数返回值，返回非负描述符。返回-1表示出错，errno被置为
+合适的值。这个地方会出什么错呢？比如，系统或者进程没有可用的描述字了，比如你第
+一二个参数组合不合法。
+
+2、int connect(int connfd, 
+              (const struct sockaddr*)&connaddr, 
+              socklen_t addrlen);
+连接服务器，服务器的地址和端口在第二个参数指定。我比较熟悉struct sockaddr_in
+这个struct sockeadr和我熟悉的有什么区别呢？我熟悉的是IPV4的地址值存储结构，但是
+还有其他的其他协议族的套接字地址结构，怎么才能在connect()的第二个参数传递多种类
+型的指针呢？void*，对的，这是可以的。但是，刚才提的问题是在void*提出前出现的，
+所以，就出现了一种通用的套接字地址结构：struct sockaddr。因为有不同的套接字地址
+结构，而有的套接字地址结构是可变的，所以才有connect()第三个参数存在必要的。
+
+返回值，connect()返回值为-1表示出错，0表示成功。成功容易理解，出错会出什么错呢
+？当然是没有成功连接服务器。第一种情况是SYN报文根本没有送到服务器，connect()会
+重试，多次重试没有成功返回ETIMEOUT；第二种情况是SYN报文送达指定服务器，服务器发
+现请求服务端口并没有进程监听，直接返回RST报文，connect()返回错误：ECONNREFUSED
+；第三种情况是connect()发出的SYN在路上有路由器返回destination unreachable，这是
+软错误（soft error），这是相对于硬错误RST而说的。connect()会再次像在第一种情况
+下描述的继续重试，直至超时。返回EHOSTUNREACH或ENETUNREACH。
+
+我特意在3.0.0-12-generic-pae #20-Ubuntu平台上测了一下ETIMEOUT会怎么发生，
+connect()会在3,6,12，24,48秒后重试，一共重试了5次共93秒。
+
