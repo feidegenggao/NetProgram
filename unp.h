@@ -22,6 +22,8 @@
 #include    <errno.h>
 #include    <sys/types.h>
 #include    <string.h>
+#include    <wait.h>
+#include    <signal.h>
 
 #include    <iostream>
 

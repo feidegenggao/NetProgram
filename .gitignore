@@ -13,3 +13,6 @@
 
 #exec file
 *.out
+
+#tags
+tags

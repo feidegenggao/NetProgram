@@ -1,0 +1,37 @@
+本节主要记录一个简单的多进程回射服务器在异常情况下的动作，以及如何处置。
+
+1、正常终止时序：客户端输入Ctrl+D，客户端读到结束符，结束进程，关闭套接字，发出
+FIN报文。服务器子进程收到FIN后退出进程，向父进程发出SINCHLD，目前代码并没有处
+理这个信号，子进程就进入僵死状态。我们需要处理这个僵死进程。下一步就会处理。
+问题是，为什么会变成僵死状态？子进程退出后处于僵死状态目的是维护子进程的信息，
+以便父进程在以后某个时候获取这些信息。
+处理方法是：设置信号处理函数处理SIGCHLD。
+加上信号处理函数，
+void sig_child(int signo)                                                          
+{                                                                                  
+    pid_t   pid;                                                                   
+    int     stat;                                                                  
+                                                                                   
+    pid = wait(&stat);                                                             
+    printf("child %d terminated\n", pid);                                          
+    return;                                                                        
+}
+即可处理子进程退出僵死事件。
+在3.0.0-12-generic-pae #20-Ubuntu下，accept并没有因处理SIGCHLD而打印中断错误。
+这是为什么呢？TODO
+
+2、信号处理函数signal();在函数执行之前如果有同样的信号到达多次，那么singal()只
+被调用一次，比如多个SIGCHLD同时到达，而用上面的sing_child()，则只会处理一个僵死
+进程，其余发送SIGCHLD的进程仍是僵死状态。那该怎么办呢？修改sig_child()即可。修
+改成：
+void sig_child(int signo)                                                          
+{                                                                                  
+    pid_t   pid;                                                                   
+    int     stat;                                                                  
+                                                                                   
+    while ( (pid = waitpid(-1, &stat, WNOHANG)) > 0)
+        printf("child %d terminated\n", pid);                                          
+    return;                                                                        
+}
+
+

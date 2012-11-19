@@ -18,6 +18,17 @@
 #include    "NetProgram/unp.h"
 #include    "echo_server.h"
 
+void sig_child(int signo)
+{
+    pid_t   pid;
+    int     stat;
+
+    while ( (pid = waitpid(-1, &stat, WNOHANG)) > 0)
+    //pid = wait(&stat);
+        printf("child %d terminated\n", pid);
+    return;
+}
+
 int main(int argc, char** argv)
 {
     if (argc != 2)
@@ -54,6 +65,8 @@ int main(int argc, char** argv)
         fprintf(stderr, "listen error:%s\n", strerror(errno));
         exit(FAILED);
     }
+    
+    signal(SIGCHLD, sig_child);
 
     pid_t childpid;
     int acceptfd;
@@ -68,6 +81,10 @@ int main(int argc, char** argv)
                 exit(0);
             }
             close(acceptfd);
+        }
+        else
+        {
+            perror("accept error.");
         }
         
     }
