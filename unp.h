@@ -98,5 +98,4 @@ again:
     *ptr = 0;
     return (n);
 }
-
 #endif
