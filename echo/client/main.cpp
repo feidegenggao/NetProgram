@@ -17,6 +17,11 @@
  */
 #include   "NetProgram/unp.h" 
 #include   "echo_client.h"
+void sig_pipe(int signu)
+{
+    printf("pipe error");
+    return;
+}
 
 int main(int argc, char** argv)
 {
@@ -25,6 +30,7 @@ int main(int argc, char** argv)
         fprintf(stderr, "USAGE:%s serverAddr serverPort\n", argv[0]);
         exit(-1);
     } 
+    signal(SIGPIPE, sig_pipe);
     int connport = atoi(argv[2]);
 
     struct sockaddr_in connaddr;
@@ -34,7 +40,7 @@ int main(int argc, char** argv)
     socklen_t connaddrlen = sizeof(connaddr);
 
 
-    int connnu = 5;
+    int connnu = 1;
     int connfd[connnu];
     for (int i = 0; i < connnu; i++)
     {

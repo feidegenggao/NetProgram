@@ -25,10 +25,13 @@ void echo_client(FILE* fp, int connfd)
     while(fgets(sendline, MAXLINE, fp) != NULL)
     {
         writen(connfd, sendline, strlen(sendline));
+        sleep(1);
+        
+        writen(connfd, sendline, strlen(sendline));
         if (readline(connfd, recvline, MAXLINE) == 0)
         {
             perror("echo_client(FILE*, int):serer terminated prematurely");
-            exit(-1);
+            //exit(-1);
         }
         fputs(recvline, stdout);
     }

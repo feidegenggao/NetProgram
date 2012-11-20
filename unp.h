@@ -18,6 +18,7 @@
 #ifndef     _UNIX_NETWORK_PROGRAMING_HEADER_
 #define     _UNIX_NETWORK_PROGRAMING_HEADER_
 #include    <stdio.h>
+#include    <unistd.h>
 #include    <stdlib.h>
 #include    <errno.h>
 #include    <sys/types.h>
