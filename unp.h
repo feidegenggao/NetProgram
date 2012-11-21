@@ -60,8 +60,8 @@ ssize_t writen(int sockfd, const void* vptr, size_t sendlen)
         sendlen -= writedlen;
         sendbuf += writedlen;
     }
-    //successfull
-    return 0;
+    //successfull,return bytes number of not sended
+    return sendlen;
 }
 
 ssize_t readline(int fd, void* vptr, size_t maxlen)

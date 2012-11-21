@@ -24,10 +24,8 @@ void echo_client(FILE* fp, int connfd)
     char recvline[MAXLINE];
     while(fgets(sendline, MAXLINE, fp) != NULL)
     {
-        writen(connfd, sendline, strlen(sendline));
-        sleep(1);
+        int writedn = writen(connfd, sendline, strlen(sendline));
         
-        writen(connfd, sendline, strlen(sendline));
         if (readline(connfd, recvline, MAXLINE) == 0)
         {
             perror("echo_client(FILE*, int):serer terminated prematurely");

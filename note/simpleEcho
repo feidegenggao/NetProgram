@@ -51,3 +51,6 @@ ENETUNREACH。
 继续往套接字写数据（对端进程确实关闭了）会触发套接字返回RST报文。
 套接字收到RST前，在阻塞读则会返回ECONNRESET。
 套接字如果是在阻塞的写一个收到RST报文的套接字则会有SIGPIPE信号发生。
+
+最后还要再提一下字节序的问题，我以前整理过，现在是明白了，字节序需要应用层自己
+管理。我的笔记链接：http://www.evernote.com/shard/s104/sh/e36f201c-b233-4384-9ccc-e2114e06c277/822d3a7bc07d7aaee7ec80f8d4fde381
