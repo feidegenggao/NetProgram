@@ -38,6 +38,7 @@ int main(int argc, char** argv)
         fprintf(stderr, "Create listenfd error:%s\n", strerror(errno));
         exit(FAILED);
     }
+    setSockReUseAddr(listenfd);
 
     struct sockaddr_in listenaddr;
     bzero(&listenaddr, sizeof(listenaddr));

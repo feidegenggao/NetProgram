@@ -31,12 +31,12 @@ void sig_child(int signo)
 
 int main(int argc, char** argv)
 {
-    if (argc != 2)
+    if (argc != 3)
     {
-        fprintf(stderr, "USAGE:%s listenport\n", argv[0]);
+        fprintf(stderr, "USAGE:%s listenaddr listenport\n", argv[0]);
         exit(FAILED);
     }
-    int listenport = atoi(argv[1]);
+    int listenport = atoi(argv[2]);
     if (listenport <= 0 or listenport > 65535)
     {
         fprintf(stderr, "Listen port should in(0, 65535)\n");
@@ -51,7 +51,8 @@ int main(int argc, char** argv)
 
     struct sockaddr_in listenaddr;
     listenaddr.sin_family = AF_INET;
-    listenaddr.sin_addr.s_addr = htonl(INADDR_ANY);
+    inet_pton(AF_INET, argv[1], &(listenaddr.sin_addr.s_addr));
+    //listenaddr.sin_addr.s_addr = htonl(INADDR_ANY);
     listenaddr.sin_port = htons(listenport);
     if ( FAILED == (bind(listenfd, (struct sockaddr*)&listenaddr, sizeof(listenaddr))))
     {

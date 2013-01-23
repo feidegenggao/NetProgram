@@ -25,6 +25,7 @@
 #include    <string.h>
 #include    <wait.h>
 #include    <signal.h>
+#include    <fcntl.h>
 
 #include    <iostream>
 
@@ -35,6 +36,7 @@ const int SUCCESSFUL = 0;
 const int FAILED = -1;
 const int MAXLINE = 1024;
 const int LISTEN_Q = 1024;
+typedef struct sockaddr SA;
 
 ssize_t writen(int sockfd, const void* vptr, size_t sendlen)
 {
@@ -98,6 +100,50 @@ again:
     }
     *ptr = 0;
     return (n);
+}
+
+static int setSockReUseAddr(int listenfd)
+{
+    int optval = 1;
+    socklen_t optlen = sizeof(optval);
+    if (FAILED == setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, 
+                            (const void*)&optval, optlen))
+    {
+        return FAILED;
+    }
+    return SUCCESSFUL;
+}
+
+static int setNonBlock(int sockfd)
+{
+    int flags;
+    if ( (flags = fcntl(sockfd, F_GETFL, 0)) < 0)
+    {
+        return flags;
+    }
+    flags |= O_NONBLOCK;
+    int result;
+    if ( (result = fcntl(sockfd, F_SETFL, flags)) < 0)
+    {
+        return result;
+    }
+    return SUCCESSFUL;
+}
+
+static int clrNonBlock(int sockfd)
+{
+    int flags;
+    if ( (flags = fcntl(sockfd, F_GETFL, 0)) < 0)
+    {
+        return flags;
+    }
+    flags &= ~O_NONBLOCK;
+    int result;
+    if ( (result = fcntl(sockfd, F_SETFL, flags)) < 0)
+    {
+        return result;
+    }
+    return SUCCESSFUL;
 }
 
 #endif

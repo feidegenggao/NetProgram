@@ -15,7 +15,7 @@
  *
  * ============================================================================
  */
-#include    "unp.h"
+#include    "NetProgram/unp.h"
 int main(int argc, char** argv)
 {
     if (argc != 2)
@@ -38,13 +38,12 @@ int main(int argc, char** argv)
     servaddr.sin_family = AF_INET;
     servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
     servaddr.sin_port = htons(atoi(argv[1]));
-    std::cout<<"htonl"<<htons(atoi(argv[1]))<<std::endl;
 
     if ( -1 == bind(listenfd, (SA *) &servaddr, sizeof(servaddr)))
     {
         perror("bind error");
     }
-    if ( - 1 == (listen(listenfd, LISTENQ)))
+    if ( - 1 == (listen(listenfd, LISTEN_Q)))
     {
         perror("listen error");
     }

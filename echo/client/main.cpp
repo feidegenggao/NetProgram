@@ -46,6 +46,22 @@ int main(int argc, char** argv)
     {
         connfd[i] = socket(AF_INET, SOCK_STREAM, 0);
 
+        struct sockaddr_in clientaddr;
+        clientaddr.sin_family = AF_INET;
+        if ((inet_aton("192.168.13.200", (in_addr*)&clientaddr.sin_addr.s_addr)) == 0)
+        {
+
+        }
+        //clientaddr.sin_addr.s_addr = htonl("192.168.13.200");
+        clientaddr.sin_port = htons(0);
+
+        int binderror = 0;
+        if ( 0 > (binderror = bind(connfd[i], (struct sockaddr*)&clientaddr, sizeof(clientaddr))))
+        {
+            perror("bind error when port is 0");
+        }
+        printf("binderror:%d\n", binderror);
+
         if (connfd[i] == -1)
         {
 
